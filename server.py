@@ -53,12 +53,17 @@ def purchasePlaces():
     club = [c for c in clubs if c['name'] == request.form['club']][0]
     placesRequired = int(request.form['places'])
 
-    # Vérification du nombre de places disponibles
-    if placesRequired > int(competition['numberOfPlaces']):
-        flash(f"Il n'y a pas assez de places disponibles. Vous avez demandé {placesRequired} places, mais il n'en reste que {competition['numberOfPlaces']}.")
+    # Vérification : pas plus de 12 places
+    if placesRequired > 12:
+        flash(f"Vous ne pouvez pas réserver plus de 12 places. Vous avez demandé {placesRequired} places.")
         return render_template('welcome.html', club=club, competitions=competitions)
 
-    # Vérification des points du club
+    # Vérification du nombre de places disponibles dans la compétition
+    if placesRequired > int(competition['numberOfPlaces']):
+        flash(f"Il n'y a pas assez de places disponibles. Il reste {competition['numberOfPlaces']} places.")
+        return render_template('welcome.html', club=club, competitions=competitions)
+
+    # Vérification des points disponibles du club
     if placesRequired > int(club['points']):
         flash(f"Vous n'avez pas assez de points pour réserver {placesRequired} places. Vous avez {club['points']} points.")
         return render_template('welcome.html', club=club, competitions=competitions)
@@ -69,7 +74,6 @@ def purchasePlaces():
 
     flash(f"Réservation réussie ! Vous avez réservé {placesRequired} places pour {competition['name']}.")
     return render_template('welcome.html', club=club, competitions=competitions)
-
 
 # TODO: Add route for points display
 
