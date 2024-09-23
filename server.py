@@ -62,17 +62,15 @@ def purchasePlaces():
     if 'placesReservees' not in club:
         club['placesReservees'] = {}
 
-    if competition['name'] not in club['placesReservees']:
-        club['placesReservees'][competition['name']] = 0
+    # Calcul du total des places réservées par le club pour tous les événements
+    totalPlacesReservees = sum(club['placesReservees'].values())
 
-    totalReserved = club['placesReservees'][competition['name']]
-
-    # Vérification : la somme des places réservées ne doit pas dépasser 12
-    if totalReserved + placesRequired > 12:
-        flash(f"Vous avez déjà réservé {totalReserved} places. Vous ne pouvez réserver que {12 - totalReserved} places supplémentaires.")
+    # Vérification : la somme des places réservées ne doit pas dépasser 12, tous événements confondus
+    if totalPlacesReservees + placesRequired > 12:
+        flash(f"Vous avez déjà réservé {totalPlacesReservees} places. Vous ne pouvez réserver que {12 - totalPlacesReservees} places supplémentaires.")
         return render_template('welcome.html', club=club, competitions=competitions)
 
-    # Vérification du nombre de places disponibles dans la compétition
+    # Vérification des places disponibles dans la compétition
     if placesRequired > int(competition['numberOfPlaces']):
         flash(f"Il n'y a pas assez de places disponibles. Il reste {competition['numberOfPlaces']} places.")
         return render_template('welcome.html', club=club, competitions=competitions)
@@ -85,10 +83,17 @@ def purchasePlaces():
     # Mise à jour des places et des points
     competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - placesRequired
     club['points'] = int(club['points']) - placesRequired
-    club['placesReservees'][competition['name']] += placesRequired  # Mettre à jour le total réservé
+    
+    # Mise à jour des places réservées pour cet événement
+    if competition['name'] not in club['placesReservees']:
+        club['placesReservees'][competition['name']] = 0
+    club['placesReservees'][competition['name']] += placesRequired
 
-    flash(f"Réservation réussie ! Vous avez réservé {placesRequired} places pour {competition['name']}.")
+    totalPlacesReservees += placesRequired
+
+    flash(f"Réservation réussie ! Vous avez réservé {placesRequired} places pour {competition['name']}. Total des places réservées : {totalPlacesReservees} sur 12.")
     return render_template('welcome.html', club=club, competitions=competitions)
+
 
 # TODO: Add route for points display
 
