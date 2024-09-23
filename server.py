@@ -95,6 +95,13 @@ def purchasePlaces():
     return render_template('welcome.html', club=club, competitions=competitions)
 
 
+
+@app.route('/public-points')
+def publicPoints():
+    # Récupérer la liste des clubs et leurs points pour les afficher publiquement
+    return render_template('public_points.html', clubs=clubs)
+
+
 # TODO: Add route for points display
 
 
