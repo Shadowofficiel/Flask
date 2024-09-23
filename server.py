@@ -53,6 +53,11 @@ def purchasePlaces():
     club = [c for c in clubs if c['name'] == request.form['club']][0]
     placesRequired = int(request.form['places'])
 
+    # Vérification que le nombre de places demandées est supérieur à 0
+    if placesRequired <= 0:
+        flash("Le nombre de places à réserver doit être supérieur à zéro.")
+        return render_template('welcome.html', club=club, competitions=competitions)
+
     # Initialiser le nombre de places réservées si ce n'est pas déjà fait
     if 'placesReservees' not in club:
         club['placesReservees'] = {}
@@ -84,7 +89,6 @@ def purchasePlaces():
 
     flash(f"Réservation réussie ! Vous avez réservé {placesRequired} places pour {competition['name']}.")
     return render_template('welcome.html', club=club, competitions=competitions)
-
 
 # TODO: Add route for points display
 
