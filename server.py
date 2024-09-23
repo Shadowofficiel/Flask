@@ -32,7 +32,7 @@ def showSummary():
         return render_template('welcome.html', club=club, competitions=competitions)
     else:
         # Message flash pour les emails non valides
-        flash("Désolé, l'email n'est pas reconnu. Veuillez réessayer.")
+        flash("Désolé, l'email n'est pas reconnu . Veuillez réessayer.")
         return redirect(url_for('index'))
 
 
