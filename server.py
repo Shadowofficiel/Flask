@@ -47,13 +47,27 @@ def book(competition,club):
         return render_template('welcome.html', club=club, competitions=competitions)
 
 
-@app.route('/purchasePlaces',methods=['POST'])
+@app.route('/purchasePlaces', methods=['POST'])
 def purchasePlaces():
     competition = [c for c in competitions if c['name'] == request.form['competition']][0]
     club = [c for c in clubs if c['name'] == request.form['club']][0]
     placesRequired = int(request.form['places'])
-    competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-placesRequired
-    flash('Great-booking complete!')
+
+    # Vérification du nombre de places disponibles
+    if placesRequired > int(competition['numberOfPlaces']):
+        flash(f"Il n'y a pas assez de places disponibles. Vous avez demandé {placesRequired} places, mais il n'en reste que {competition['numberOfPlaces']}.")
+        return render_template('welcome.html', club=club, competitions=competitions)
+
+    # Vérification des points du club
+    if placesRequired > int(club['points']):
+        flash(f"Vous n'avez pas assez de points pour réserver {placesRequired} places. Vous avez {club['points']} points.")
+        return render_template('welcome.html', club=club, competitions=competitions)
+
+    # Mise à jour des places et des points
+    competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - placesRequired
+    club['points'] = int(club['points']) - placesRequired
+
+    flash(f"Réservation réussie ! Vous avez réservé {placesRequired} places pour {competition['name']}.")
     return render_template('welcome.html', club=club, competitions=competitions)
 
 
