@@ -53,9 +53,18 @@ def purchasePlaces():
     club = [c for c in clubs if c['name'] == request.form['club']][0]
     placesRequired = int(request.form['places'])
 
-    # Vérification : pas plus de 12 places
-    if placesRequired > 12:
-        flash(f"Vous ne pouvez pas réserver plus de 12 places. Vous avez demandé {placesRequired} places.")
+    # Initialiser le nombre de places réservées si ce n'est pas déjà fait
+    if 'placesReservees' not in club:
+        club['placesReservees'] = {}
+
+    if competition['name'] not in club['placesReservees']:
+        club['placesReservees'][competition['name']] = 0
+
+    totalReserved = club['placesReservees'][competition['name']]
+
+    # Vérification : la somme des places réservées ne doit pas dépasser 12
+    if totalReserved + placesRequired > 12:
+        flash(f"Vous avez déjà réservé {totalReserved} places. Vous ne pouvez réserver que {12 - totalReserved} places supplémentaires.")
         return render_template('welcome.html', club=club, competitions=competitions)
 
     # Vérification du nombre de places disponibles dans la compétition
@@ -71,9 +80,11 @@ def purchasePlaces():
     # Mise à jour des places et des points
     competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - placesRequired
     club['points'] = int(club['points']) - placesRequired
+    club['placesReservees'][competition['name']] += placesRequired  # Mettre à jour le total réservé
 
     flash(f"Réservation réussie ! Vous avez réservé {placesRequired} places pour {competition['name']}.")
     return render_template('welcome.html', club=club, competitions=competitions)
+
 
 # TODO: Add route for points display
 
